@@ -5,6 +5,7 @@ import com.santos.hexagonal.adapters.in.controller.request.CustomerRequest;
 import com.santos.hexagonal.adapters.in.controller.response.CustomerResponse;
 import com.santos.hexagonal.application.ports.in.FindCustomerByIdInputPort;
 import com.santos.hexagonal.application.ports.in.InsertCustomerInputPort;
+import com.santos.hexagonal.application.ports.in.UpdateCustomerInputPort;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,9 @@ public class CustomerController {
     private FindCustomerByIdInputPort findCustomerByIdInputPort;
 
     @Autowired
+    private UpdateCustomerInputPort updateCustomerInputPort;
+
+    @Autowired
     private CustomerMapper customerMapper;
 
     @PostMapping
@@ -35,5 +39,16 @@ public class CustomerController {
         var customer = this.findCustomerByIdInputPort.find(id);
         var customerResponse = this.customerMapper.toCustomerResponse(customer);
         return ResponseEntity.ok().body(customerResponse);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> update(
+            @PathVariable final String id,
+            @Valid @RequestBody CustomerRequest customerRequest
+    ) {
+        var customer = this.customerMapper.toCustomer(customerRequest);
+        customer.setId(id);
+        this.updateCustomerInputPort.update(customer, customerRequest.getZipCode());
+        return ResponseEntity.noContent().build();
     }
 }
