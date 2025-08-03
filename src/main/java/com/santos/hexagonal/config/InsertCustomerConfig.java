@@ -2,6 +2,7 @@ package com.santos.hexagonal.config;
 
 import com.santos.hexagonal.adapters.out.FindAddressByZipCodeAdapter;
 import com.santos.hexagonal.adapters.out.InsertCustomerAdapter;
+import com.santos.hexagonal.adapters.out.SendCpfForValidationAdapter;
 import com.santos.hexagonal.application.core.usecase.InsertCustomerUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,8 +13,9 @@ public class InsertCustomerConfig {
     @Bean
     public InsertCustomerUseCase insertCustomerUseCase(
             FindAddressByZipCodeAdapter findAddressByZipCodeAdapter,
-            InsertCustomerAdapter insertCustomerAdapter
+            InsertCustomerAdapter insertCustomerAdapter,
+            SendCpfForValidationAdapter sendCpfForValidationAdapter
     ) {
-        return new InsertCustomerUseCase(findAddressByZipCodeAdapter, insertCustomerAdapter);
+        return new InsertCustomerUseCase(findAddressByZipCodeAdapter, insertCustomerAdapter, sendCpfForValidationAdapter);
     }
 }
