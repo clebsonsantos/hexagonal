@@ -1,6 +1,5 @@
 package com.santos.hexagonal.adapters.out;
 
-import com.santos.hexagonal.adapters.in.controller.mapper.CustomerMapper;
 import com.santos.hexagonal.adapters.out.repository.CustomerRepository;
 import com.santos.hexagonal.adapters.out.repository.mapper.CustomerEntityMapper;
 import com.santos.hexagonal.application.core.domain.Customer;
