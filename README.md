@@ -1,5 +1,14 @@
 
 
+### What is Port and Adapters Architecture?
+
+- On the left side, the adapter depends on the port and gets injected a concrete implementation of the port, which contains the use case. On this side, both the port and its concrete implementation (the use case) belong inside the application;
+
+- On the right side, the adapter is the concrete implementation of the port and is injected in our business logic although our business logic only knows about the interface. On this side, the port belongs inside the application, but its concrete implementation belongs outside and it wraps around some external tool.
+
+<img src="./image.webp"/>
+
+[Image's credits](https://medium.com/the-software-architecture-chronicles/ports-adapters-architecture-d19f2d476eca)
 ### WireMock
 `instalation`: [click here](https://wiremock.org/docs/download-and-installation/)
 
