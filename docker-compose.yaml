@@ -1,22 +1,32 @@
-
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.7.1
+    container_name: zookeeper
     networks:
       - broker-kafka
     ports:
-      - 2181:2181
+      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.7.1
+    container_name: kafka
     networks:
       - broker-kafka
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     ports:
-      - 9092:9092
+      - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -24,33 +34,74 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   kafdrop:
-    image: obsidiandynamics/kafdrop:latest
+    image: obsidiandynamics/kafdrop:3.31.0
+    container_name: kafdrop
     networks:
       - broker-kafka
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     ports:
-      - 9000:9000
+      - "9000:9000"
     environment:
       KAFKA_BROKERCONNECT: kafka:29092
+      JVM_OPTS: "-Xms32M -Xmx64M"
+
   mongo:
-    image: mongo
+    image: mongo:7.0
+    container_name: mongo
     restart: always
+    networks:
+      - broker-kafka
     ports:
-      - 27017:27017
+      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   mongo-express:
-    image: mongo-express
+    image: mongo-express:1.0.2
+    container_name: mongo-express
     restart: always
+    networks:
+      - broker-kafka
+    depends_on:
+      mongo:
+        condition: service_healthy
     ports:
-      - 8083:8083
+      - "8083:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8081"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 networks:
   broker-kafka:
     driver: bridge
+
+volumes:
+  zookeeper-data:
+  kafka-data:
+  mongo-data:
