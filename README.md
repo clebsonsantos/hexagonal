@@ -37,3 +37,9 @@ So, You will need to add mocking files (/src/main/resources/mock) into `mapping`
           "isValidCpf": true
         }
         ```
+
+
+### Security between application layers
+
+- [ArchUnit](https://www.archunit.org/userguide/html/000_Index.html)
+- [Test Results - java_in_hexagonal.html](Test%20Results%20-%20java_in_hexagonal.html)
