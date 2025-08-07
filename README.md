@@ -15,6 +15,25 @@
 ```commandline
     java -jar wiremock-standalone-4.0.0-beta.14.jar --port 8082
 ```
+We will mock our address API.
 
 After running, it will create two folders `mapping` and `__files`. 
 So, You will need to add mocking files (/src/main/resources/mock) into `mapping` folder. 
+
+
+### Kafka
+
+- Topics:
+  - tp-cpf-validation
+  - tp-cpf-validated
+- Publish event `tp-cpf-validated`:
+  - JSON format:
+    - ```json
+        {
+          "id": "customer's id",
+          "name": "Customer's name",
+          "zipCode": "0000000",
+          "cpf": "00000000000",
+          "isValidCpf": true
+        }
+        ```
